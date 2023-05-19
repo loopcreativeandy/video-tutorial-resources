@@ -41,13 +41,14 @@ async function main(){
     }
     let ix;
     if (INITIALIZE) {
-        const args =  {
-            createMetadataAccountArgsV2: {
+        const args : mpl.CreateMetadataAccountV3InstructionArgs =  {
+            createMetadataAccountArgsV3: {
                 data: dataV2,
-                isMutable: true
+                isMutable: true,
+                collectionDetails: null
             }
         };
-        ix = mpl.createCreateMetadataAccountV2Instruction(accounts, args);
+        ix = mpl.createCreateMetadataAccountV3Instruction(accounts, args);
     } else {
         const args =  {
             updateMetadataAccountArgsV2: {
