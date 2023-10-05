@@ -10,7 +10,7 @@ const crypto = require('crypto').webcrypto;
 (async()=>{
     const myAddress = 'DTnUKgY1dq447iaehoCVpoBEe6S98qspRTBbGm9ZxKZb' as Base58EncodedAddress;
     
-    const rpc = createSolanaRpc({transport: createDefaultRpcTransport({ url: 'https://devnet.helius-rpc.com/?api-key=06c25b64-3d11-40ca-82d8-347a062e74f2' })});
+    const rpc = createSolanaRpc({transport: createDefaultRpcTransport({ url: '...' })});
 
     const kp = await generateKeyPair();
     const publicKey = await getAddressFromPublicKey(kp.publicKey);
