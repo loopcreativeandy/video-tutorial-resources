@@ -1,0 +1,16 @@
+{
+  "name": "web3v2",
+  "private": true,
+  "main": "experimental-iterate-on-this-one.js",
+  "scripts": {
+    "start": "ts-node experimental-iterate-on-this-one.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@solana/functional": "^2.0.0-experimental.ba46ce1",
+    "@solana/web3.js": "^2.0.0-experimental.ba46ce1",
+    "@solana/webcrypto-ed25519-polyfill": "^2.0.0-experimental.f1279e6",
+    "ts-node": "^10.9.1"
+  }
+}
