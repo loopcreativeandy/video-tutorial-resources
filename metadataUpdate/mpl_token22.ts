@@ -24,7 +24,7 @@ const INITIALIZE = true;
 async function main(){
     console.log("let's name some token-22 tokens in 2024!");
     const myKeypair = loadWalletKey("AndyUCWqhEnEMqHAByoRSHz2mvQxdyXyki9UQ7YCrTBY.json");
-    const mint = new web3.PublicKey("SD2idHukkWPziSuhVnD6yf2gNbgzGYzyvv7787ZvazK")//"SDTHBG48VGNoGS1U2ArnvMUZ3dxyGr1F4TT1ojD4QDB");
+    const mint = new web3.PublicKey("SD2idHukkWPziSuhVnD6yf2gNbgzGYzyvv7787ZvazK");
 
     const umi = createUmi("https://api.devnet.solana.com");
     const signer = createSignerFromKeypair(umi, fromWeb3JsKeypair(myKeypair))
@@ -82,47 +82,6 @@ async function main(){
         console.log(bs58.encode(txid.signature))
     }
 
-
-
-
-    // const seed1 = Buffer.from("metadata", "utf-8");
-    // const seed2 = Buffer.from(MPL_TOKEN_METADATA_PROGRAM_ID.toBytes());
-    // const seed3 = Buffer.from(mint.toBytes());
-    // const [metadataPDA, _bump] = web3.PublicKey.findProgramAddressSync([seed1, seed2, seed3], MPL_TOKEN_METADATA_PROGRAM_ID);
-    // const accounts = {
-    //     metadata: metadataPDA,
-    //     mint,
-    //     mintAuthority: myKeypair.publicKey,
-    //     payer: myKeypair.publicKey,
-    //     updateAuthority: myKeypair.publicKey,
-    // }
-    // let ix;
-    // if (INITIALIZE) {
-
-    //     const args : mpl.CreateMetadataAccountV3InstructionArgs =  {
-    //         createMetadataAccountArgsV3: {
-    //             data: dataV2,
-    //             isMutable: true,
-    //             collectionDetails: null
-    //         }
-    //     };
-    //     ix = mpl.createCreateMetadataAccountV3Instruction(accounts, args);
-    // } else {
-    //     const args =  {
-    //         updateMetadataAccountArgsV2: {
-    //             data: dataV2,
-    //             isMutable: true,
-    //             updateAuthority: myKeypair.publicKey,
-    //             primarySaleHappened: true
-    //         }
-    //     };
-    //     ix = mpl.createUpdateMetadataAccountV2Instruction(accounts, args)
-    // }
-    // const tx = new web3.Transaction();
-    // tx.add(ix);
-    // const connection = new web3.Connection("https://api.mainnet-beta.solana.com");
-    // const txid = await web3.sendAndConfirmTransaction(connection, tx, [myKeypair]);
-    // console.log(txid);
 
 }
 
