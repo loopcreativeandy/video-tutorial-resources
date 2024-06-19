@@ -12,8 +12,6 @@ const INVALIDATED: u64 = 3;
 mod hello_anchor {
     use super::*;
     pub fn store_memo(ctx: Context<MemoContext>, _memo_index: u32, memo: [u8; 512]) -> Result<()> {
-        let memo_len = memo.len() as u64;
-        require_gte!(MAX_MEMO_SIZE, memo_len, MyError::MemoTooLong);
         ctx.accounts.new_account.state = INITIALIZED;
         ctx.accounts.new_account.memo = memo;
         ctx.accounts.new_account.authority = ctx.accounts.signer.key();
