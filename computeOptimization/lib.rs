@@ -25,8 +25,8 @@ mod hello_anchor {
         require_neq!(ctx.accounts.memo_account.state, INVALIDATED, MyError::MemoInValidated);
         require_neq!(ctx.accounts.memo_account.state, UNINITIALIZED, MyError::MemoUnititialized);
         require_keys_eq!(ctx.accounts.memo_account.authority, ctx.accounts.signer.key(), MyError::MemoOwnerDoesntMatch);
-        require!(is_valid_memo(&ctx.accounts.memo_account.memo), MyError::MemoIsNotValid);
-        if is_valid_memo(&ctx.accounts.memo_account.memo) {
+        require!(is_valid, MyError::MemoIsNotValid);
+        if is_valid {
             ctx.accounts.memo_account.state = VALID;
         }
         Ok(())
