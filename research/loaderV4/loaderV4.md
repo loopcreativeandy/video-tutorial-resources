@@ -270,26 +270,49 @@ accumulated substantial discussion"* and SIMD-0315 *"remains contentious"*.
 
 ## The feature gate address history
 
-The `enable_loader_v4` feature gate has held **four different addresses**. Each
+The `enable_loader_v4` feature gate has held **six different addresses**. Each
 row was confirmed by `git log -S<address>` over the full history of
-`anza-xyz/agave` on 2026-08-21.
+`anza-xyz/agave` on 2026-08-21, scoped to the feature-set source file
+(`feature-set/src/lib.rs` and its two earlier locations,
+`sdk/feature-set/src/lib.rs` and `sdk/src/feature_set.rs`).
 
 | # | Address | Gate name | PR that set it | Merged | Commit |
 |---|---|---|---|---|---|
-| 1 | `8oBxsYqnCvUTGzgEpxPcnVf7MLbWWPYddE33PftFeBBd` | `enable_program_runtime_v2_and_loader_v4` | [solana-labs/solana#33294](https://github.com/solana-labs/solana/pull/33294) — Lichtso | 2023-09-19 | `bc38ef27d` |
-| 2 | `2aQJYqER2aKyb3cZw22v4SL2xMX7vwXBRWfvS4pTrtED` | `enable_loader_v4` | [agave#2796](https://github.com/anza-xyz/agave/pull/2796) "Refactor - Makes loader-v4 the default" — Lichtso | 2025-01-23 | `6ff4dee5f` |
-| 3 | `LoaderV4Wi11BeDe1eted1111111111111111111111` | `enable_loader_v4` | [agave#11470](https://github.com/anza-xyz/agave/pull/11470) "unkey loader v4" — buffalojoec | 2026-03-23 | `5ce903413` |
-| 4 | `LoaderV4WasAbandoned11111111111111111111111` | `enable_loader_v4` | [agave#11990](https://github.com/anza-xyz/agave/pull/11990) "delete loader v4 program" — buffalojoec | 2026-04-30 | `c31906430` |
+| 1 | `8oBxsYqnCvUTGzgEpxPcnVf7MLbWWPYddE33PftFeBBd` | `enable_program_runtime_v2_and_loader_v4` | [solana-labs/solana#33294](https://github.com/solana-labs/solana/pull/33294) "Feature - Enable Program-Runtime-v2 and Loader-v4" — Lichtso | 2023-09-19 | `bc38ef27d8` |
+| 2 | `8Cb77yHjPWe9wuWUfXeh6iszFGCDGNCoFk3tprViYHNm` | `enable_loader_v4` | [agave#2796](https://github.com/anza-xyz/agave/pull/2796) "Refactor - Makes loader-v4 the default" — Lichtso | 2025-01-23 | `6ff4dee5f8` |
+| 3 | `G8yMNsNUd4p3VB22ycrPEB1qRgepCFeFpAqD2Lr66s36` | `enable_loader_v4` | [agave#5968](https://github.com/anza-xyz/agave/pull/5968) "Feature - Remove loader v4 instruction deploy from source" — Lichtso | 2025-04-26 | `da65770481` |
+| 4 | `2aQJYqER2aKyb3cZw22v4SL2xMX7vwXBRWfvS4pTrtED` | `enable_loader_v4` | [agave#6106](https://github.com/anza-xyz/agave/pull/6106) "Fix - Loader-v3 to v4 migration of closed programs" — Lichtso | 2025-05-07 | `64e19be684` |
+| 5 | `LoaderV4Wi11BeDe1eted1111111111111111111111` | `enable_loader_v4` | [agave#11470](https://github.com/anza-xyz/agave/pull/11470) "unkey loader v4" — buffalojoec | 2026-03-23 | `5ce903413a` |
+| 6 | `LoaderV4WasAbandoned11111111111111111111111` | `enable_loader_v4` | [agave#11990](https://github.com/anza-xyz/agave/pull/11990) "delete loader v4 program" — buffalojoec | 2026-04-30 | `c31906430a` |
 
-Addresses 3 and 4 are vanity placeholders with no corresponding private key, so
-the feature can never be activated. Address 3 uses leetspeak (`Wi11BeDe1eted`)
+Addresses 5 and 6 are vanity placeholders with no corresponding private key, so
+the feature can never be activated. Address 5 uses leetspeak (`Wi11BeDe1eted`)
 because base58 contains neither `l` nor `0` — the same reason
 `BPFLoaderUpgradeab1e` is spelled with a `1`.
+
+Rows 1→4 are Lichtso *building* the loader — the gate is renamed when V4 becomes
+the default (1→2), then rekeyed twice more as the semantics behind it change.
+Rows 5→6 are Joe Caulfield *dismantling* it. Same file, same 43-character field,
+opposite direction.
+
+**Why rekey a gate that was never activated?** A feature gate is a promise about
+exactly what behaviour a validator opts into when the account activates. If the
+behaviour changes while the gate is still queued, the address is retired and a
+new one issued, so no cluster can activate stale semantics. Both mid-chain
+rekeys are that: #5968 dropped the `DeployFromSource` instruction, and #6106
+changed how closed programs migrate from Loader V3 to V4. #6106's summary of
+changes leads with the words **"Rekeys the feature"**. Both PRs point at
+[feature-gate-tracker issue #78](https://github.com/anza-xyz/feature-gate-tracker/issues/78).
 
 **PR #33294**, which created the original gate, stated:
 
 > The loader-v4 is currently unreachable outside of unit tests. So, a feature
 > gate for local testing should be introduced.
+
+**PR #2796**, which renamed and rekeyed it, stated:
+
+> Loader-v4 was originally planned as a PRv2 loader, but will be used as default
+> loader (superseding loader-v3) in PRv1 now.
 
 **PR #11470**, which un-keyed it, stated:
 
@@ -319,16 +342,39 @@ And the entry in the feature-name table that makes it appear in tooling output,
 ### Which Agave releases contain which address
 
 `solana feature status` prints the address compiled into the binary you are
-running, so the CLI version determines what you see.
+running, so the CLI version determines what you see. Every Agave release tag
+from v2.2.0 to v4.3.0-beta.2 was checked out and read directly on 2026-08-21:
 
-| Agave tag | `enable_loader_v4` address |
-|---|---|
-| v3.0.0 | `2aQJYqER2aKyb3cZw22v4SL2xMX7vwXBRWfvS4pTrtED` |
-| v4.0.0 | `2aQJYqER2aKyb3cZw22v4SL2xMX7vwXBRWfvS4pTrtED` |
-| **v4.1.0** | **`LoaderV4WasAbandoned11111111111111111111111`** |
-| v4.2.0 | `LoaderV4WasAbandoned11111111111111111111111` |
+| Agave tag range | Released | `enable_loader_v4` address |
+|---|---|---|
+| v2.2.0 – v2.2.4 | 2025-02-15 – 2025-03-24 | *(not in the agave tree — see note)* |
+| v2.2.5 – v2.2.12 | 2025-03-25 – 2025-04-23 | `8Cb77yHjPWe9wuWUfXeh6iszFGCDGNCoFk3tprViYHNm` |
+| **v2.2.13** | 2025-05-02 | **`G8yMNsNUd4p3VB22ycrPEB1qRgepCFeFpAqD2Lr66s36`** |
+| v2.2.14 – v4.0.3 | 2025-05-09 – 2026-06-16 | `2aQJYqER2aKyb3cZw22v4SL2xMX7vwXBRWfvS4pTrtED` |
+| **v4.1.0-beta.0 onward** | 2026-05-22 – | **`LoaderV4WasAbandoned11111111111111111111111`** |
 
-The rekey reaches released binaries in **Agave v4.1.0**.
+Three things fall out of that table:
+
+- **The rekey reaches released binaries in Agave v4.1.0** (first stable tag
+  2026-06-26; first pre-release tag v4.1.0-beta.0 on 2026-05-22).
+- **`G8yMNsNUd4p3VB22ycrPEB1qRgepCFeFpAqD2Lr66s36` shipped in exactly one
+  release, v2.2.13.** It lived eleven days on master and caught a single tag.
+- **`LoaderV4Wi11BeDe1eted1111111111111111111111` never shipped at all.** It was
+  on master from 2026-03-23 to 2026-04-30, but the v4.0 release branch had
+  already been cut and v4.1 was not cut until after #11990 replaced it, so no
+  released Agave binary ever contained that address. It exists only in git
+  history.
+
+The long `2aQJ…` plateau is why that address is the one most people have seen:
+it was the compiled-in value for thirteen months across the v2.2, v3.0, v3.1 and
+v4.0 lines.
+
+*Note on v2.2.0 – v2.2.4:* the SDK was removed from the agave repo in
+[#4867](https://github.com/anza-xyz/agave/pull/4867) (2025-02-08) and the
+`agave-feature-set` crate was only added back in
+[#5417](https://github.com/anza-xyz/agave/pull/5417) (2025-03-24). In that
+window the address came from the external `solana-feature-set` crate, so it is
+not readable from the agave tree at those tags.
 
 ---
 
@@ -538,6 +584,8 @@ Every `enable_loader_v4` address, on every cluster:
 | Address | mainnet-beta | devnet | testnet |
 |---|---|---|---|
 | `8oBxsYqnCvUTGzgEpxPcnVf7MLbWWPYddE33PftFeBBd` | no account | no account | no account |
+| `8Cb77yHjPWe9wuWUfXeh6iszFGCDGNCoFk3tprViYHNm` | no account | no account | no account |
+| `G8yMNsNUd4p3VB22ycrPEB1qRgepCFeFpAqD2Lr66s36` | no account | no account | no account |
 | `2aQJYqER2aKyb3cZw22v4SL2xMX7vwXBRWfvS4pTrtED` | no account | no account | no account |
 | `LoaderV4Wi11BeDe1eted1111111111111111111111` | no account | no account | no account |
 | `LoaderV4WasAbandoned11111111111111111111111` | no account | no account | no account |
@@ -571,6 +619,27 @@ git log -S"LoaderV4WasAbandoned11111111111111111111111" \
 
 The three paths are the file's historical locations. Restricting to them keeps
 the search fast on a blobless clone.
+
+Each address returns **two** commits: the one that introduced it and the one
+that replaced it. Reading the diff of the replacing commit gives you the *next*
+address, and reading the diff of the introducing commit gives you the
+*previous* one, so you walk the chain in both directions until a pickaxe returns
+only a single commit — that's an endpoint. Skipping this step is how the two
+mid-chain addresses (`8Cb77y…` and `G8yM…`) were missed on the first pass: the
+`2aQJ…` pickaxe alone finds where that address *ends*, not where the gate
+*began*.
+
+To map addresses onto released binaries rather than commits, read the file at
+each tag instead of walking history:
+
+```sh
+for t in $(git tag -l 'v*' | sort -V); do
+  printf '%s ' "$t"
+  git show "$t:feature-set/src/lib.rs" 2>/dev/null \
+    | grep -A1 'pub mod enable_loader_v4' \
+    | grep -o '[1-9A-HJ-NP-Za-km-z]\{32,44\}'
+done
+```
 
 ---
 
@@ -620,8 +689,13 @@ prerequisites in ["On-Chain Loader Prerequisites"](#on-chain-loader-prerequisite
 - solana#34194, disable bpf loader management instructions — <https://github.com/solana-labs/solana/pull/34194>
 - solana#31570, rename loader-v3 to loader-v4 — <https://github.com/solana-labs/solana/pull/31570>
 - solana#33294, first loader-v4 feature gate — <https://github.com/solana-labs/solana/pull/33294>
-- agave#2796, makes loader-v4 the default — <https://github.com/anza-xyz/agave/pull/2796>
+- agave#2796, makes loader-v4 the default (renames + rekeys the gate) — <https://github.com/anza-xyz/agave/pull/2796>
 - agave#4856, CLI v3→v4 migration — <https://github.com/anza-xyz/agave/pull/4856>
+- agave#4867, sdk: remove everything from the repo — <https://github.com/anza-xyz/agave/pull/4867>
+- agave#5417, add agave-feature-set crate — <https://github.com/anza-xyz/agave/pull/5417>
+- agave#5968, remove loader v4 DeployFromSource (2nd rekey) — <https://github.com/anza-xyz/agave/pull/5968>
+- agave#6106, fix v3→v4 migration of closed programs (3rd rekey) — <https://github.com/anza-xyz/agave/pull/6106>
+- feature-gate-tracker#78, the `enable_loader_v4` tracker issue — <https://github.com/anza-xyz/feature-gate-tracker/issues/78>
 - agave#6131, ExtendProgramChecked — <https://github.com/anza-xyz/agave/pull/6131>
 - agave#10396, delete loader v4 (closed) — <https://github.com/anza-xyz/agave/pull/10396>
 - agave#11470, unkey loader v4 — <https://github.com/anza-xyz/agave/pull/11470>
